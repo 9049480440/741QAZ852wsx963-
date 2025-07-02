@@ -4,234 +4,437 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Угадай Число - Telegram Game</title>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body {
+        * {
+            box-sizing: border-box;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
+
+        .game-container {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            max-width: 400px;
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .stat-box {
+            background: white;
+            padding: 15px 10px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .progress-container {
+            margin-bottom: 20px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #4caf50;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .progress-fill.warning {
+            background: #ff9800;
+        }
+
+        .progress-fill.danger {
+            background: #f44336;
+        }
+
+        .hint-box {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            font-weight: 500;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .guess-input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            font-size: 18px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .guess-input:focus {
+            outline: none;
+            border-color: #2196f3;
+        }
+
+        .guess-btn {
+            padding: 15px 25px;
+            background: #2196f3;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .guess-btn:hover {
+            background: #1976d2;
+        }
+
+        .quick-buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 25px;
+        }
+
+        .quick-btn {
+            padding: 10px;
+            background: #f5f5f5;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .quick-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .game-over {
+            margin-bottom: 25px;
+        }
+
+        .celebration {
+            font-size: 60px;
+            margin-bottom: 15px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-30px);
+            }
+            60% {
+                transform: translateY(-15px);
+            }
+        }
+
+        .new-game-btn {
+            width: 100%;
+            padding: 15px;
+            background: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .new-game-btn:hover {
+            background: #45a049;
+        }
+
+        .rules {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: left;
+            margin-top: 25px;
+        }
+
+        .rules-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .rules-list {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .rules-list li {
+            margin-bottom: 5px;
+        }
+
+        .blue { color: #2196f3; }
+        .green { color: #4caf50; }
+        .red { color: #f44336; }
+        .purple { color: #9c27b0; }
     </style>
 </head>
 <body>
-    <div id="root"></div>
+    <div class="game-container">
+        <div class="header">
+            <div class="title">🎯 Угадай Число</div>
+            <div class="subtitle">Телеграм мини-игра</div>
+        </div>
 
-    <script type="text/babel">
-        const { useState, useEffect } = React;
-        const { Trophy, RotateCcw, Target, Zap } = lucide;
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-value blue" id="score">0</div>
+                <div class="stat-label">Очки</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value green" id="bestScore">0</div>
+                <div class="stat-label">Рекорд</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value purple" id="gamesPlayed">0</div>
+                <div class="stat-label">Игр</div>
+            </div>
+        </div>
 
-        function GuessNumberGame() {
-            const [targetNumber, setTargetNumber] = useState(0);
-            const [guess, setGuess] = useState('');
-            const [attempts, setAttempts] = useState(0);
-            const [maxAttempts] = useState(7);
-            const [gameStatus, setGameStatus] = useState('playing');
-            const [hint, setHint] = useState('Загадано число от 1 до 100');
-            const [score, setScore] = useState(0);
-            const [gamesPlayed, setGamesPlayed] = useState(0);
-            const [bestScore, setBestScore] = useState(0);
+        <div class="progress-container">
+            <div class="progress-info">
+                <span>Попытки: <span id="attempts">0</span>/7</span>
+                <span><span id="remaining">7</span> осталось</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
 
-            useEffect(() => {
-                startNewGame();
-            }, []);
+        <div class="hint-box" id="hint">
+            Загадано число от 1 до 100
+        </div>
 
-            const startNewGame = () => {
-                const newNumber = Math.floor(Math.random() * 100) + 1;
-                setTargetNumber(newNumber);
-                setGuess('');
-                setAttempts(0);
-                setGameStatus('playing');
-                setHint('Загадано число от 1 до 100');
-            };
+        <div id="gameArea">
+            <div class="input-container">
+                <input type="number" class="guess-input" id="guessInput" placeholder="Введите число..." min="1" max="100">
+                <button class="guess-btn" onclick="makeGuess()">⚡</button>
+            </div>
+            
+            <div class="quick-buttons">
+                <button class="quick-btn" onclick="setGuess(1)">1</button>
+                <button class="quick-btn" onclick="setGuess(25)">25</button>
+                <button class="quick-btn" onclick="setGuess(50)">50</button>
+                <button class="quick-btn" onclick="setGuess(75)">75</button>
+                <button class="quick-btn" onclick="setGuess(100)">100</button>
+            </div>
+        </div>
 
-            const makeGuess = () => {
-                const guessNumber = parseInt(guess);
-                
-                if (isNaN(guessNumber) || guessNumber < 1 || guessNumber > 100) {
-                    setHint('Введите число от 1 до 100!');
-                    return;
-                }
+        <div id="gameOverArea" style="display: none;">
+            <div class="game-over">
+                <div class="celebration" id="celebration"></div>
+            </div>
+            <button class="new-game-btn" onclick="startNewGame()">🔄 Новая игра</button>
+        </div>
 
-                const newAttempts = attempts + 1;
-                setAttempts(newAttempts);
+        <div class="rules">
+            <div class="rules-title">🏆 Правила игры</div>
+            <ul class="rules-list">
+                <li>• Угадайте число от 1 до 100</li>
+                <li>• У вас есть 7 попыток</li>
+                <li>• Меньше попыток = больше очков</li>
+                <li>• Следите за подсказками!</li>
+            </ul>
+        </div>
+    </div>
 
-                if (guessNumber === targetNumber) {
-                    setGameStatus('won');
-                    const points = Math.max(100 - (newAttempts - 1) * 10, 10);
-                    setScore(score + points);
-                    setGamesPlayed(gamesPlayed + 1);
-                    if (points > bestScore) {
-                        setBestScore(points);
-                    }
-                    setHint(`🎉 Поздравляю! Вы угадали за ${newAttempts} попыток! (+${points} очков)`);
-                } else if (newAttempts >= maxAttempts) {
-                    setGameStatus('lost');
-                    setGamesPlayed(gamesPlayed + 1);
-                    setHint(`😔 Игра окончена! Было загадано число ${targetNumber}`);
-                } else {
-                    const difference = Math.abs(guessNumber - targetNumber);
-                    let hintText = '';
-                    
-                    if (difference <= 5) {
-                        hintText = '🔥 Очень горячо!';
-                    } else if (difference <= 10) {
-                        hintText = '🌡️ Горячо!';
-                    } else if (difference <= 20) {
-                        hintText = '❄️ Холодно';
-                    } else {
-                        hintText = '🧊 Очень холодно';
-                    }
+    <script>
+        let targetNumber = 0;
+        let attempts = 0;
+        let maxAttempts = 7;
+        let gameStatus = 'playing';
+        let score = 0;
+        let gamesPlayed = 0;
+        let bestScore = 0;
 
-                    if (guessNumber < targetNumber) {
-                        hintText += ' Число больше!';
-                    } else {
-                        hintText += ' Число меньше!';
-                    }
-
-                    setHint(hintText);
-                }
-
-                setGuess('');
-            };
-
-            const handleKeyPress = (e) => {
-                if (e.key === 'Enter' && gameStatus === 'playing') {
-                    makeGuess();
-                }
-            };
-
-            const getStatusColor = () => {
-                switch (gameStatus) {
-                    case 'won': return 'text-green-600';
-                    case 'lost': return 'text-red-600';
-                    default: return 'text-blue-600';
-                }
-            };
-
-            const getProgressBarColor = () => {
-                const percentage = (attempts / maxAttempts) * 100;
-                if (percentage < 50) return 'bg-green-500';
-                if (percentage < 80) return 'bg-yellow-500';
-                return 'bg-red-500';
-            };
-
-            return (
-                <div className="max-w-md mx-auto bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl shadow-2xl p-6 font-sans">
-                    <div className="text-center mb-6">
-                        <div className="flex items-center justify-center gap-2 mb-2">
-                            <Target className="text-blue-500" size={24} />
-                            <h1 className="text-2xl font-bold text-gray-800">Угадай Число</h1>
-                        </div>
-                        <p className="text-gray-600 text-sm">Телеграм мини-игра</p>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-2 mb-6 text-center">
-                        <div className="bg-white rounded-lg p-2 shadow-sm">
-                            <div className="text-lg font-bold text-blue-600">{score}</div>
-                            <div className="text-xs text-gray-600">Очки</div>
-                        </div>
-                        <div className="bg-white rounded-lg p-2 shadow-sm">
-                            <div className="text-lg font-bold text-green-600">{bestScore}</div>
-                            <div className="text-xs text-gray-600">Рекорд</div>
-                        </div>
-                        <div className="bg-white rounded-lg p-2 shadow-sm">
-                            <div className="text-lg font-bold text-purple-600">{gamesPlayed}</div>
-                            <div className="text-xs text-gray-600">Игр</div>
-                        </div>
-                    </div>
-
-                    <div className="mb-4">
-                        <div className="flex justify-between text-sm text-gray-600 mb-1">
-                            <span>Попытки: {attempts}/{maxAttempts}</span>
-                            <span>{maxAttempts - attempts} осталось</span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div 
-                                className={`h-2 rounded-full transition-all duration-300 ${getProgressBarColor()}`}
-                                style={{ width: `${(attempts / maxAttempts) * 100}%` }}
-                            ></div>
-                        </div>
-                    </div>
-
-                    <div className={`text-center p-3 rounded-lg mb-4 font-medium ${getStatusColor()} bg-white shadow-sm`}>
-                        {hint}
-                    </div>
-
-                    {gameStatus === 'playing' ? (
-                        <div className="space-y-4">
-                            <div className="flex gap-2">
-                                <input
-                                    type="number"
-                                    value={guess}
-                                    onChange={(e) => setGuess(e.target.value)}
-                                    onKeyPress={handleKeyPress}
-                                    placeholder="Введите число..."
-                                    className="flex-1 p-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-center text-lg font-semibold"
-                                    min="1"
-                                    max="100"
-                                />
-                                <button
-                                    onClick={makeGuess}
-                                    className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-semibold shadow-md"
-                                >
-                                    <Zap size={20} />
-                                </button>
-                            </div>
-                            
-                            <div className="grid grid-cols-5 gap-1">
-                                {[1, 25, 50, 75, 100].map(num => (
-                                    <button
-                                        key={num}
-                                        onClick={() => setGuess(num.toString())}
-                                        className="p-2 bg-gray-200 hover:bg-gray-300 rounded text-sm font-medium transition-colors"
-                                    >
-                                        {num}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="text-center space-y-4">
-                            {gameStatus === 'won' && (
-                                <div className="text-6xl animate-bounce">🎉</div>
-                            )}
-                            {gameStatus === 'lost' && (
-                                <div className="text-6xl">😔</div>
-                            )}
-                            
-                            <button
-                                onClick={startNewGame}
-                                className="w-full p-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-semibold shadow-md flex items-center justify-center gap-2"
-                            >
-                                <RotateCcw size={20} />
-                                Новая игра
-                            </button>
-                        </div>
-                    )}
-
-                    <div className="mt-6 p-3 bg-white rounded-lg shadow-sm">
-                        <h3 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1">
-                            <Trophy size={16} />
-                            Правила игры
-                        </h3>
-                        <ul className="text-xs text-gray-600 space-y-1">
-                            <li>• Угадайте число от 1 до 100</li>
-                            <li>• У вас есть 7 попыток</li>
-                            <li>• Меньше попыток = больше очков</li>
-                            <li>• Следите за подсказками!</li>
-                        </ul>
-                    </div>
-                </div>
-            );
+        function startNewGame() {
+            targetNumber = Math.floor(Math.random() * 100) + 1;
+            attempts = 0;
+            gameStatus = 'playing';
+            
+            document.getElementById('guessInput').value = '';
+            document.getElementById('hint').textContent = 'Загадано число от 1 до 100';
+            
+            updateDisplay();
+            showGameArea();
         }
 
-        ReactDOM.render(<GuessNumberGame />, document.getElementById('root'));
+        function makeGuess() {
+            const guessInput = document.getElementById('guessInput');
+            const guess = parseInt(guessInput.value);
+            
+            if (isNaN(guess) || guess < 1 || guess > 100) {
+                document.getElementById('hint').textContent = 'Введите число от 1 до 100!';
+                return;
+            }
+
+            attempts++;
+            
+            if (guess === targetNumber) {
+                gameStatus = 'won';
+                const points = Math.max(100 - (attempts - 1) * 10, 10);
+                score += points;
+                gamesPlayed++;
+                if (points > bestScore) {
+                    bestScore = points;
+                }
+                document.getElementById('hint').textContent = `🎉 Поздравляю! Вы угадали за ${attempts} попыток! (+${points} очков)`;
+                showGameOver('🎉');
+            } else if (attempts >= maxAttempts) {
+                gameStatus = 'lost';
+                gamesPlayed++;
+                document.getElementById('hint').textContent = `😔 Игра окончена! Было загадано число ${targetNumber}`;
+                showGameOver('😔');
+            } else {
+                const difference = Math.abs(guess - targetNumber);
+                let hintText = '';
+                
+                if (difference <= 5) {
+                    hintText = '🔥 Очень горячо!';
+                } else if (difference <= 10) {
+                    hintText = '🌡️ Горячо!';
+                } else if (difference <= 20) {
+                    hintText = '❄️ Холодно';
+                } else {
+                    hintText = '🧊 Очень холодно';
+                }
+
+                if (guess < targetNumber) {
+                    hintText += ' Число больше!';
+                } else {
+                    hintText += ' Число меньше!';
+                }
+
+                document.getElementById('hint').textContent = hintText;
+            }
+
+            guessInput.value = '';
+            updateDisplay();
+        }
+
+        function setGuess(number) {
+            document.getElementById('guessInput').value = number;
+        }
+
+        function updateDisplay() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('bestScore').textContent = bestScore;
+            document.getElementById('gamesPlayed').textContent = gamesPlayed;
+            document.getElementById('attempts').textContent = attempts;
+            document.getElementById('remaining').textContent = maxAttempts - attempts;
+            
+            const percentage = (attempts / maxAttempts) * 100;
+            const progressFill = document.getElementById('progressFill');
+            progressFill.style.width = percentage + '%';
+            
+            progressFill.className = 'progress-fill';
+            if (percentage >= 80) {
+                progressFill.classList.add('danger');
+            } else if (percentage >= 50) {
+                progressFill.classList.add('warning');
+            }
+        }
+
+        function showGameArea() {
+            document.getElementById('gameArea').style.display = 'block';
+            document.getElementById('gameOverArea').style.display = 'none';
+        }
+
+        function showGameOver(emoji) {
+            document.getElementById('gameArea').style.display = 'none';
+            document.getElementById('gameOverArea').style.display = 'block';
+            document.getElementById('celebration').textContent = emoji;
+        }
+
+        // Обработчик Enter
+        document.getElementById('guessInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && gameStatus === 'playing') {
+                makeGuess();
+            }
+        });
+
+        // Запускаем игру
+        startNewGame();
     </script>
 </body>
 </html>
